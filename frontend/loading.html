@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auditing - TinyFish</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <style>
+    .loading-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .loading-content {
+      max-width: 500px;
+      padding: 2rem;
+    }
+
+    .loading-spinner {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 2rem;
+      border: 6px solid rgba(99, 102, 241, 0.1);
+      border-top: 6px solid var(--color-accent-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #F3F4F6;
+      border-radius: 9999px;
+      overflow: hidden;
+      margin: 2rem 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--gradient-accent);
+      border-radius: 9999px;
+      animation: progress 300s linear;
+      transition: width 0.5s ease;
+    }
+
+    @keyframes progress {
+      0% { width: 0%; }
+      100% { width: 100%; }
+    }
+
+    .status-text {
+      color: var(--color-text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .url-display {
+      font-family: 'Roboto Mono', monospace;
+      color: var(--color-accent-primary);
+      font-weight: 500;
+      margin: 1rem 0;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div class="loading-container">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+
+      <h1>Analyzing Your Site</h1>
+
+      <div class="url-display" id="audit-url">
+        <!-- URL will be injected here -->
+      </div>
+
+      <p class="status-text" id="status-text">
+        TinyFish is performing AI-powered analysis...
+      </p>
+
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+
+      <p style="color: var(--color-text-secondary); font-size: 0.875rem;">
+        This may take up to 5 minutes for a single-page audit.
+        We're checking for technical failures, contextual errors, and competitive gaps.
+      </p>
+
+      <div style="margin-top: 3rem;">
+        <h3 style="font-size: 1rem; margin-bottom: 1rem;">What We're Analyzing:</h3>
+        <div style="text-align: left; max-width: 400px; margin: 0 auto;">
+          <p style="padding: 0.5rem 0; color: var(--color-text-secondary); font-size: 0.875rem;">
+            ✓ Technical failures (broken links, dead CTAs)
+          </p>
+          <p style="padding: 0.5rem 0; color: var(--color-text-secondary); font-size: 0.875rem;">
+            ✓ Contextual errors (outdated content, price contradictions)
+          </p>
+          <p style="padding: 0.5rem 0; color: var(--color-text-secondary); font-size: 0.875rem;">
+            ✓ Competitive gaps (missing information)
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Get URL from query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const auditUrl = urlParams.get('url');
+
+    if (auditUrl) {
+      document.getElementById('audit-url').textContent = auditUrl;
+    }
+
+    // Simulate progress updates
+    const statusMessages = [
+      'Loading page...',
+      'Analyzing technical elements...',
+      'Checking for broken links...',
+      'Evaluating contextual accuracy...',
+      'Comparing against industry standards...',
+      'Compiling results...'
+    ];
+
+    let currentMessage = 0;
+    setInterval(() => {
+      currentMessage = (currentMessage + 1) % statusMessages.length;
+      document.getElementById('status-text').textContent = statusMessages[currentMessage];
+    }, 10000); // Change message every 10 seconds
+
+    // Simulate API polling (in real implementation, poll /api/audit/{id})
+    // For now, redirect to dashboard after 5 seconds (for demo purposes)
+    setTimeout(() => {
+      window.location.href = '/dashboard';
+    }, 5000);
+  </script>
+</body>
+</html>

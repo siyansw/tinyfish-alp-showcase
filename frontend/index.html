@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TinyFish Agent Loss Prevention - AI-powered website audits that detect issues traditional crawlers miss">
+  <title>TinyFish Agent Loss Prevention - AI Website Audits</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/static/css/styles.css">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐟</text></svg>">
+</head>
+<body>
+  <!-- Hero Section -->
+  <div class="hero">
+    <div class="container">
+      <h1>Agent Loss Prevention</h1>
+      <p>
+        AI-powered audits that detect website issues causing agent transaction failures.
+        Go beyond 404s - find contextual errors and competitive gaps.
+      </p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Audit Input Form -->
+    <div class="section text-center">
+      <div class="card" style="max-width: 700px; margin: 0 auto;">
+        <h2 style="font-size: 1.125rem; margin-bottom: 0.5rem;">Run Your Own Audit</h2>
+        <p class="text-secondary mb-2" style="font-size: 0.813rem;">
+          Enter any URL - audit your site or analyze a competitor. Free single-page audit.
+        </p>
+        <form id="audit-form">
+          <div class="input-group">
+            <input
+              type="text"
+              id="audit-url"
+              class="input"
+              placeholder="example.com or https://example.com"
+              required
+            >
+            <button type="submit" class="btn btn-primary">
+              Audit Now
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Dashboard Content (Pre-loaded with example) -->
+    <div id="dashboard-content">
+      <!-- Header -->
+      <div id="audit-header"></div>
+
+      <!-- Metrics -->
+      <div id="metrics-container"></div>
+
+      <!-- Industry Insights -->
+      <div class="section">
+        <div class="card" style="background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%); border: 1px solid var(--purple-200);">
+          <h3 style="font-size: 0.938rem; color: var(--purple-700); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+            📰 Industry Intelligence
+          </h3>
+          <div id="industry-insights" style="font-size: 0.813rem; color: var(--purple-900);">
+            <p style="opacity: 0.8; margin-bottom: 0.5rem;">Loading latest trends...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="section">
+        <h2 class="text-center mb-3">Issue Distribution</h2>
+        <div class="charts-grid">
+          <div class="chart-container">
+            <h3 class="chart-title">By Category</h3>
+            <canvas id="category-chart"></canvas>
+          </div>
+          <div class="chart-container">
+            <h3 class="chart-title">By Severity</h3>
+            <canvas id="severity-chart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Revenue Impact & Projections -->
+      <div class="section">
+        <div class="charts-grid">
+          <!-- Revenue Impact -->
+          <div class="card card-elevated">
+            <h3 style="font-size: 0.938rem; margin-bottom: 1rem; color: var(--color-text-primary);">💰 Revenue Impact</h3>
+            <div id="revenue-impact"></div>
+          </div>
+
+          <!-- Fix Timeline -->
+          <div class="card card-elevated">
+            <h3 style="font-size: 0.938rem; margin-bottom: 1rem; color: var(--color-text-primary);">⏱️ Fix Timeline</h3>
+            <div id="fix-timeline"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Issues List -->
+      <div class="section">
+        <h2 class="mb-3">Detailed Issues</h2>
+        <div id="issues-container"></div>
+      </div>
+
+      <!-- CTA Section -->
+      <div class="cta-section">
+        <h2>Want More?</h2>
+        <p>
+          This was a <strong>FREE single-page audit</strong>.
+          Upgrade to get full-site audits, competitor analysis, scheduled scans, and more.
+        </p>
+
+        <div style="background: rgba(255,255,255,0.1); border-radius: 6px; padding: 1rem; margin: 1.25rem auto; max-width: 500px; text-align: left;">
+          <h3 style="margin-bottom: 0.75rem; font-size: 0.938rem; font-weight: 600;">Full Site Audit Includes:</h3>
+          <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.813rem;">
+            <li style="padding: 0.375rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+              ✅ Unlimited pages crawled
+            </li>
+            <li style="padding: 0.375rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+              ✅ Deep contextual analysis across your site
+            </li>
+            <li style="padding: 0.375rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+              ✅ Competitor benchmarking
+            </li>
+            <li style="padding: 0.375rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+              ✅ Historical tracking & trend analysis
+            </li>
+            <li style="padding: 0.375rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+              ✅ Scheduled recurring scans
+            </li>
+            <li style="padding: 0.375rem 0;">
+              ✅ API access & custom integrations
+            </li>
+          </ul>
+        </div>
+
+        <div class="cta-buttons">
+          <a href="#audit-form" class="btn btn-primary btn-large">
+            Get Full Site Audit
+          </a>
+          <a href="#audit-form" class="btn btn-secondary btn-large">
+            Audit a Competitor
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>
+        Powered by <span class="footer-logo">TinyFish</span> •
+        The AI Web Agent Platform
+      </p>
+      <p style="margin-top: 0.5rem; font-size: 0.75rem;">
+        Detecting issues traditional crawlers miss since 2026
+      </p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module" src="/static/js/dashboard.js"></script>
+</body>
+</html>

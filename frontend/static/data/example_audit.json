@@ -1,0 +1,85 @@
+{
+  "url": "https://example-ecommerce.com",
+  "audit_date": "2026-02-07T10:30:00",
+  "technical_failures": [
+    {
+      "error_type": "dead_cta",
+      "element": "Add to Cart button",
+      "location": "Product detail page, primary CTA below product description",
+      "expected_behavior": "Should add item to shopping cart and show confirmation",
+      "actual_behavior": "Button click produces no action, no error message displayed",
+      "transaction_impact": "Complete transaction failure - agent cannot add items to cart, 100% abandonment rate",
+      "severity": "critical"
+    },
+    {
+      "error_type": "broken_link",
+      "element": "Customer Support link in footer",
+      "location": "Footer navigation section",
+      "expected_behavior": "Should navigate to support contact page",
+      "actual_behavior": "Returns 404 Not Found error",
+      "transaction_impact": "Agent cannot reach support if encountering issues, leading to transaction abandonment when problems arise",
+      "severity": "high"
+    },
+    {
+      "error_type": "missing_media",
+      "element": "Product thumbnail images in category grid",
+      "location": "Category listing page, product cards",
+      "expected_behavior": "Should display product images",
+      "actual_behavior": "Image URLs return 404, showing broken image placeholders",
+      "transaction_impact": "Agent cannot visually verify products, may skip items or lose confidence in site reliability",
+      "severity": "medium"
+    }
+  ],
+  "contextual_errors": [
+    {
+      "error_type": "seasonal_mismatch",
+      "content": "🎄 Holiday Gift Guide - Perfect Presents for Everyone!",
+      "location": "Homepage hero banner section",
+      "why_wrong": "Current date is February 2026, well past holiday shopping season",
+      "agent_confusion": "Agent may interpret as outdated content, skip promotional pricing, or question site maintenance",
+      "severity": "high"
+    },
+    {
+      "error_type": "price_contradiction",
+      "content": "Product listed as $49.99 in search results but $69.99 on product page",
+      "location": "Search results grid vs. product detail page",
+      "why_wrong": "Same product shows different prices in different contexts",
+      "agent_confusion": "Agent cannot determine correct price, may abandon due to pricing uncertainty or perceived deception",
+      "severity": "critical"
+    },
+    {
+      "error_type": "availability_mismatch",
+      "content": "Product shows 'In Stock' on listing but 'Currently Unavailable' at checkout",
+      "location": "Product card vs. checkout page",
+      "why_wrong": "Conflicting availability information at different stages",
+      "agent_confusion": "Agent proceeds through purchase flow only to fail at final step, wasting processing time",
+      "severity": "high"
+    }
+  ],
+  "competitive_gaps": [
+    {
+      "gap_type": "missing_pricing",
+      "missing_element": "Shipping costs and delivery timeframes",
+      "location": "Product pages and cart view",
+      "competitor_standard": "Major e-commerce sites show estimated shipping costs and delivery dates before checkout",
+      "agent_impact": "Agent must proceed through entire checkout flow to discover total cost, increasing friction and abandonment",
+      "severity": "high"
+    },
+    {
+      "gap_type": "unclear_availability",
+      "missing_element": "Real-time stock status",
+      "location": "Product listing and detail pages",
+      "competitor_standard": "Show 'In Stock', 'Low Stock', or 'Out of Stock' badges prominently",
+      "agent_impact": "Agent cannot determine if product is available before adding to cart, leading to checkout failures",
+      "severity": "medium"
+    },
+    {
+      "gap_type": "missing_specs",
+      "missing_element": "Product dimensions and material specifications",
+      "location": "Product detail pages",
+      "competitor_standard": "Detailed specifications section with measurements, materials, care instructions",
+      "agent_impact": "Agent cannot verify product meets requirements, may skip or request additional information",
+      "severity": "low"
+    }
+  ]
+}
