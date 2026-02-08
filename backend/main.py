@@ -8,7 +8,7 @@ from pathlib import Path
 
 from backend.models import AuditRequest, AuditResponse
 from backend.tinyfish_client import run_audit
-from backend.enrichment import get_quick_insights
+from backend.enrichment import get_quick_insights, enrich_audit_with_news
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -68,10 +68,8 @@ async def create_audit(request: AuditRequest):
     This endpoint:
     1. Validates the URL
     2. Calls TinyFish API with the audit prompt
-    3. Parses the response into structured data
-    4. Returns the audit results
-
-    Falls back to mock data if TinyFish API is unavailable.
+    3. Enriches with company news from DuckDuckGo
+    4. Returns the audit results with enrichment data
     """
     try:
         logger.info(f"Starting audit for URL: {request.url}")
@@ -79,10 +77,19 @@ async def create_audit(request: AuditRequest):
         # Generate unique audit ID
         audit_id = str(uuid.uuid4())
 
-        # Run the audit using TinyFish API (with fallback to mock)
+        # Run the audit using TinyFish API
         result = await run_audit(request.url)
 
         logger.info(f"Audit completed for {request.url}: {result.total_issues} issues found")
+
+        # Enrich with company news (run in background, don't block on failure)
+        try:
+            enrichment_data = await enrich_audit_with_news(request.url)
+            result.enrichment = enrichment_data
+            logger.info(f"Enrichment completed: {len(enrichment_data.get('news', []))} news articles found")
+        except Exception as enrich_error:
+            logger.warning(f"Enrichment failed, continuing without it: {enrich_error}")
+            result.enrichment = {"company_name": "", "news": [], "incidents": [], "competitive_intel": []}
 
         return AuditResponse(
             audit_id=audit_id,

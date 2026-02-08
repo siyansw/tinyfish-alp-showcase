@@ -28,15 +28,47 @@ export async function initDashboard() {
 }
 
 /**
- * Load and display industry insights
+ * Load and display industry insights or company news
  */
-async function loadIndustryInsights() {
+async function loadIndustryInsights(enrichmentData = null) {
+  const insightsEl = document.getElementById('industry-insights');
+  if (!insightsEl) return;
+
+  // If we have enrichment data with news, show company-specific news
+  if (enrichmentData && enrichmentData.news && enrichmentData.news.length > 0) {
+    const companyName = enrichmentData.company_name || 'Company';
+    insightsEl.innerHTML = `
+      <h4 style="font-size: 0.813rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--purple-700);">
+        Recent News: ${escapeHtml(companyName)}
+      </h4>
+      <ul style="list-style: none; padding: 0; margin: 0;">
+        ${enrichmentData.news.map(article => `
+          <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(124, 58, 237, 0.1);">
+            <div style="font-weight: 500; color: var(--purple-900); margin-bottom: 0.25rem;">
+              ${escapeHtml(article.title)}
+            </div>
+            <div style="font-size: 0.75rem; color: var(--purple-700); opacity: 0.8;">
+              ${escapeHtml(article.source)} • ${escapeHtml(article.date || 'Recent')}
+            </div>
+            ${article.summary ? `
+              <div style="font-size: 0.75rem; color: var(--purple-900); opacity: 0.8; margin-top: 0.25rem;">
+                ${escapeHtml(article.summary)}
+              </div>
+            ` : ''}
+          </li>
+        `).join('')}
+      </ul>
+      <p style="font-size: 0.688rem; margin-top: 0.75rem; opacity: 0.7;">Powered by TinyFish + DuckDuckGo</p>
+    `;
+    return;
+  }
+
+  // Fallback to generic industry insights
   try {
     const response = await fetch('/api/insights');
     const data = await response.json();
 
-    const insightsEl = document.getElementById('industry-insights');
-    if (insightsEl && data.insights) {
+    if (data.insights) {
       insightsEl.innerHTML = `
         <ul style="list-style: none; padding: 0; margin: 0;">
           ${data.insights.map(insight => `
@@ -122,6 +154,9 @@ function renderDashboard(data, isExample) {
 
   // Render executive summary
   renderExecutiveSummary(data);
+
+  // Load industry insights or company news
+  loadIndustryInsights(data.enrichment);
 
   // Render charts
   renderCharts(data);

@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
 from enum import Enum
-from typing import List
+from typing import List, Optional, Dict, Any
 
 
 class IssueSeverity(str, Enum):
@@ -49,6 +49,7 @@ class AuditResult(BaseModel):
     technical_failures: List[TechnicalFailure] = Field(default_factory=list)
     contextual_errors: List[ContextualError] = Field(default_factory=list)
     competitive_gaps: List[CompetitiveGap] = Field(default_factory=list)
+    enrichment: Optional[Dict[str, Any]] = Field(default=None, description="External enrichment data (news, incidents, etc.)")
 
     @property
     def total_issues(self) -> int:
