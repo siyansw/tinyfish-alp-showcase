@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import uuid
 import logging
+import asyncio
 from pathlib import Path
 
 from backend.models import AuditRequest, AuditResponse
@@ -77,15 +78,13 @@ async def create_audit(request: AuditRequest):
         # Generate unique audit ID
         audit_id = str(uuid.uuid4())
 
-        # Run the audit using TinyFish API
+        # Run the audit using TinyFish API - returns immediately when done
         result = await run_audit(request.url)
 
         logger.info(f"Audit completed for {request.url}: {result.total_issues} issues found")
 
-        # Skip enrichment for now - it was blocking responses for 1-2 minutes
-        # TODO: Move enrichment to a separate async endpoint or reduce timeout dramatically
-        result.enrichment = {"company_name": "", "news": [], "incidents": [], "competitive_intel": []}
-        logger.info("Enrichment skipped for faster response time")
+        # Return audit results immediately without news (frontend will fetch news separately)
+        result.enrichment = None
 
         return AuditResponse(
             audit_id=audit_id,
