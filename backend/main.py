@@ -82,14 +82,10 @@ async def create_audit(request: AuditRequest):
 
         logger.info(f"Audit completed for {request.url}: {result.total_issues} issues found")
 
-        # Enrich with company news (run in background, don't block on failure)
-        try:
-            enrichment_data = await enrich_audit_with_news(request.url)
-            result.enrichment = enrichment_data
-            logger.info(f"Enrichment completed: {len(enrichment_data.get('news', []))} news articles found")
-        except Exception as enrich_error:
-            logger.warning(f"Enrichment failed, continuing without it: {enrich_error}")
-            result.enrichment = {"company_name": "", "news": [], "incidents": [], "competitive_intel": []}
+        # Skip enrichment for now - it was blocking responses for 1-2 minutes
+        # TODO: Move enrichment to a separate async endpoint or reduce timeout dramatically
+        result.enrichment = {"company_name": "", "news": [], "incidents": [], "competitive_intel": []}
+        logger.info("Enrichment skipped for faster response time")
 
         return AuditResponse(
             audit_id=audit_id,
