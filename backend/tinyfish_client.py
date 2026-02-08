@@ -143,8 +143,9 @@ async def run_audit(url: str) -> AuditResult:
     if not settings.cerebras_api_key:
         raise ValueError("CEREBRAS_API_KEY not configured. Please set your Mino API key.")
 
-    # Build the audit task
-    audit_task = f"Visit {url} and perform this analysis:\n\n{AUDIT_PROMPT}"
+    # Build the audit task - TinyFish will automatically visit the URL we pass
+    # No need to repeat "Visit {url}" since the url parameter handles navigation
+    audit_task = AUDIT_PROMPT
 
     logger.info(f"Calling TinyFish/Mino API for URL: {url}")
 
