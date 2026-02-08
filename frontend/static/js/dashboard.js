@@ -600,9 +600,10 @@ function renderIssueCard(issue) {
 
   const title = issue.element || issue.content || issue.missing_element || 'Issue';
   const location = issue.location || 'Unknown location';
+  const auditUrl = currentAuditData?.url || '';
 
   return `
-    <div class="issue-card ${issue.severity} fade-in" style="cursor: pointer;" onclick="window.open('${currentAuditData.url}', '_blank')">
+    <div class="issue-card ${issue.severity} fade-in" style="cursor: pointer;" onclick="openAuditUrl(event)">
       <div class="issue-header">
         <span class="badge badge-${issue.severity}">
           ${severityIcon} ${issue.severity.toUpperCase()}
@@ -610,7 +611,7 @@ function renderIssueCard(issue) {
         <span class="badge" style="background: #F3F4F6; color: #6B7280;">
           ${categoryLabel}
         </span>
-        <button class="btn-icon" onclick="event.stopPropagation(); copyToClipboard('${escapeHtml(location)}', event)" title="Copy location">
+        <button class="btn-icon" onclick="event.stopPropagation(); copyToClipboard(\`${location.replace(/`/g, '\\`')}\`, event)" title="Copy location">
           📋
         </button>
       </div>
@@ -620,13 +621,27 @@ function renderIssueCard(issue) {
         <strong>${impactLabel}:</strong> ${escapeHtml(impactText)}
       </p>
       <div class="issue-actions" style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #F3F4F6;">
-        <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.375rem 0.75rem;" onclick="event.stopPropagation(); window.open('${currentAuditData.url}', '_blank')">
+        <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.375rem 0.75rem;" onclick="event.stopPropagation(); openAuditUrl(event)">
           🔗 View on Page
         </button>
       </div>
     </div>
   `;
 }
+
+/**
+ * Open the audited URL in a new tab
+ */
+function openAuditUrl(event) {
+  if (currentAuditData && currentAuditData.url) {
+    window.open(currentAuditData.url, '_blank');
+  } else {
+    console.error('No audit URL available');
+  }
+}
+
+// Make function global so it can be called from HTML
+window.openAuditUrl = openAuditUrl;
 
 /**
  * Copy text to clipboard
