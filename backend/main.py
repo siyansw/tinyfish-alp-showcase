@@ -6,6 +6,7 @@ import uuid
 import logging
 import asyncio
 from pathlib import Path
+from typing import Dict, Any
 
 from backend.models import AuditRequest, AuditResponse
 from backend.tinyfish_client import run_audit
@@ -14,6 +15,10 @@ from backend.enrichment import get_quick_insights, enrich_audit_with_news
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# In-memory cache for background news tasks
+news_tasks: Dict[str, asyncio.Task] = {}
+news_results: Dict[str, Any] = {}
 
 app = FastAPI(
     title="TinyFish Agent Loss Prevention",
@@ -78,12 +83,32 @@ async def create_audit(request: AuditRequest):
         # Generate unique audit ID
         audit_id = str(uuid.uuid4())
 
-        # Run the audit using TinyFish API - returns immediately when done
+        # Start BOTH audit and news in parallel (TinyFish can handle parallel sessions)
+        logger.info("Starting audit and news enrichment in parallel")
+
+        # Start news task in background immediately
+        async def fetch_and_cache_news():
+            try:
+                news_data = await enrich_audit_with_news(request.url)
+                news_results[request.url] = news_data
+                logger.info(f"News enrichment completed for {request.url}: {len(news_data.get('news', []))} articles")
+            except Exception as e:
+                logger.error(f"News enrichment failed for {request.url}: {e}")
+                news_results[request.url] = {"company_name": "", "news": [], "incidents": [], "competitive_intel": [], "error": str(e)}
+            finally:
+                # Clean up task reference
+                if request.url in news_tasks:
+                    del news_tasks[request.url]
+
+        # Create background task for news
+        news_tasks[request.url] = asyncio.create_task(fetch_and_cache_news())
+
+        # Run audit (will complete while news is still running in background)
         result = await run_audit(request.url)
 
         logger.info(f"Audit completed for {request.url}: {result.total_issues} issues found")
 
-        # Return audit results immediately without news (frontend will fetch news separately)
+        # Return audit results immediately (news is still running in background)
         result.enrichment = None
 
         return AuditResponse(
@@ -130,13 +155,39 @@ async def get_insights():
 async def get_company_news(url: str):
     """
     Get company-specific news for a given URL.
-    This is a separate endpoint to avoid blocking the main audit response.
+
+    This endpoint checks if news is already being fetched in the background
+    (started when audit was triggered). If so, it waits for that task.
+    If not, it starts a new fetch.
     """
     try:
-        logger.info(f"Fetching company news for: {url}")
+        logger.info(f"News request for: {url}")
+
+        # Check if result is already cached
+        if url in news_results:
+            logger.info(f"Returning cached news for {url}")
+            return news_results[url]
+
+        # Check if task is currently running
+        if url in news_tasks:
+            logger.info(f"Waiting for in-progress news task for {url}")
+            await news_tasks[url]
+            return news_results.get(url, {
+                "company_name": "",
+                "news": [],
+                "incidents": [],
+                "competitive_intel": []
+            })
+
+        # No cached result and no running task - start a new fetch
+        logger.info(f"Starting new news fetch for {url}")
         enrichment_data = await enrich_audit_with_news(url)
         logger.info(f"News fetch completed: {len(enrichment_data.get('news', []))} articles found")
+
+        # Cache the result
+        news_results[url] = enrichment_data
         return enrichment_data
+
     except Exception as e:
         logger.error(f"News fetch failed for {url}: {str(e)}")
         # Return empty data on failure, don't error out
