@@ -127,6 +127,29 @@ async def get_insights():
     }
 
 
+@app.get("/api/news/{url:path}")
+async def get_company_news(url: str):
+    """
+    Get company-specific news for a given URL.
+    This is a separate endpoint to avoid blocking the main audit response.
+    """
+    try:
+        logger.info(f"Fetching company news for: {url}")
+        enrichment_data = await enrich_audit_with_news(url)
+        logger.info(f"News fetch completed: {len(enrichment_data.get('news', []))} articles found")
+        return enrichment_data
+    except Exception as e:
+        logger.error(f"News fetch failed for {url}: {str(e)}")
+        # Return empty data on failure, don't error out
+        return {
+            "company_name": "",
+            "news": [],
+            "incidents": [],
+            "competitive_intel": [],
+            "error": str(e)
+        }
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

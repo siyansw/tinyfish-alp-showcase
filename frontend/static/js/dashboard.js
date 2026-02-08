@@ -28,6 +28,64 @@ export async function initDashboard() {
 }
 
 /**
+ * Load company news asynchronously (separate API call)
+ */
+async function loadCompanyNews(url) {
+  const insightsEl = document.getElementById('industry-insights');
+  if (!insightsEl) return;
+
+  // Show loading state
+  insightsEl.innerHTML = `
+    <div style="text-align: center; padding: 1rem; opacity: 0.7;">
+      <div class="spinner" style="margin: 0 auto 0.5rem auto;"></div>
+      <p style="font-size: 0.75rem; color: var(--purple-700);">Loading company news...</p>
+    </div>
+  `;
+
+  try {
+    // Encode URL for path parameter
+    const encodedUrl = encodeURIComponent(url);
+    const response = await fetch(`/api/news/${encodedUrl}`);
+    const enrichmentData = await response.json();
+
+    // Display news if available
+    if (enrichmentData.news && enrichmentData.news.length > 0) {
+      const companyName = enrichmentData.company_name || 'Company';
+      insightsEl.innerHTML = `
+        <h4 style="font-size: 0.813rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--purple-700);">
+          Recent News: ${escapeHtml(companyName)}
+        </h4>
+        <ul style="list-style: none; padding: 0; margin: 0;">
+          ${enrichmentData.news.map(article => `
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(124, 58, 237, 0.1);">
+              <div style="font-weight: 500; color: var(--purple-900); margin-bottom: 0.25rem;">
+                ${escapeHtml(article.title)}
+              </div>
+              <div style="font-size: 0.75rem; color: var(--purple-700); opacity: 0.8;">
+                ${escapeHtml(article.source)} • ${escapeHtml(article.date || 'Recent')}
+              </div>
+              ${article.summary ? `
+                <div style="font-size: 0.75rem; color: var(--purple-900); opacity: 0.8; margin-top: 0.25rem;">
+                  ${escapeHtml(article.summary)}
+                </div>
+              ` : ''}
+            </li>
+          `).join('')}
+        </ul>
+        <p style="font-size: 0.688rem; margin-top: 0.75rem; opacity: 0.7;">Powered by TinyFish + DuckDuckGo</p>
+      `;
+    } else {
+      // No news found, show generic insights
+      await loadIndustryInsights();
+    }
+  } catch (error) {
+    console.error('Failed to load company news:', error);
+    // Fallback to generic insights on error
+    await loadIndustryInsights();
+  }
+}
+
+/**
  * Load and display industry insights or company news
  */
 async function loadIndustryInsights(enrichmentData = null) {
@@ -155,8 +213,14 @@ function renderDashboard(data, isExample) {
   // Render executive summary
   renderExecutiveSummary(data);
 
-  // Load industry insights or company news
-  loadIndustryInsights(data.enrichment);
+  // Load industry insights or fetch company news asynchronously
+  if (!isExample && data.url) {
+    // For real audits, fetch company news in background
+    loadCompanyNews(data.url);
+  } else {
+    // For example, show generic insights
+    loadIndustryInsights(data.enrichment);
+  }
 
   // Render charts
   renderCharts(data);
