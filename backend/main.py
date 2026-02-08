@@ -51,7 +51,7 @@ async def read_loading():
 @app.get("/dashboard")
 async def read_dashboard():
     """Serve the dashboard page"""
-    return FileResponse(BASE_DIR / "frontend" / "dashboard.html")
+    return FileResponse(BASE_DIR / "frontend" / "index.html")
 
 
 @app.get("/health")
