@@ -151,7 +151,7 @@ async def run_audit(url: str) -> AuditResult:
 
     async with httpx.AsyncClient(timeout=300.0, follow_redirects=True) as client:  # 5 minute timeout
         # Call TinyFish/Mino automation endpoint (SSE streaming)
-        api_url = "https://mino.ai/v1/automation/run-sse"
+        api_url = f"{settings.tinyfish_api_url.rstrip('/')}/v1/automation/run-sse"
 
         async with client.stream(
             "POST",

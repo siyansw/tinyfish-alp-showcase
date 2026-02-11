@@ -40,7 +40,7 @@ async def enrich_audit_with_news(url: str, company_name: str = None) -> Dict[str
         # Use TinyFish to search DuckDuckGo for company news
         async with httpx.AsyncClient(timeout=60.0, follow_redirects=True) as client:
             response = await client.post(
-                "https://mino.ai/v1/automation/run-sse",
+                f"{settings.tinyfish_api_url.rstrip('/')}/v1/automation/run-sse",
                 json={
                     "url": "https://duckduckgo.com",
                     "goal": f"""Search for "{company_name} e-commerce website issues" and extract the top 3 recent news articles.
